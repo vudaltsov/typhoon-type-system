@@ -1,0 +1,834 @@
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/theme/simple.min.css" id="theme">
+    <link rel="stylesheet" href="highlight-phpstorm-light-theme.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&family=Roboto+Mono&family=Roboto:wght@400;700&display=swap">
+    <style>
+        :root {
+            --r-main-font: 'Roboto', 'Noto Color Emoji', sans-serif;
+            --r-heading-font: 'Roboto', 'Noto Color Emoji', sans-serif;
+            --r-code-font: 'Roboto Mono', 'Noto Color Emoji', monospace;
+            --r-block-margin: 10px;
+        }
+        .reveal pre {
+            font-size: .5em;
+        }
+        .nohighlight {
+            padding: 1em !important;
+        }
+        .reveal .hljs {
+            min-height: auto;
+        }
+        td.hljs-ln-code {
+            white-space: pre;
+        }
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6, .reveal pre, .reveal p, .reveal img {
+            margin: 0 var(--r-block-margin) calc(var(--r-block-margin) * 2);
+        }
+        .reveal pre {
+            width: auto;
+        }
+        .reveal pre code {
+            max-height: none;
+        }
+        .reveal .r-stack > * {
+            margin: 0;
+        }
+        .horizontal {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+        }
+        .horizontal > * {
+            flex-grow: 1;
+        }
+        .horizontal-half > * {
+            flex-grow: 0 !important;
+            width: calc(50% - var(--r-block-margin) * 2) !important;
+        }
+        .text-left {
+            text-align: left;
+        }
+    </style>
+    <title>Typhoon: новая система типов для PHP</title>
+</head>
+<body>
+<div class="reveal">
+    <div class="slides">
+        <section >
+            <img src="header.png" alt="" style="width: 100%;">
+        </section>
+
+        <section>
+            <p><img src="avatar.jpg" alt="" style="max-width: 300px;"></p>
+            <p>Валентин <a href="https://t.me/vudaltsov">@vudaltsov</a></p>
+            <p>
+                <a href="https://t.me/phpyh">Пых</a> /
+                <a href="https://youtube.com/@PHPPoint">PHP Point</a> /
+                <a href="https://t.me/isPHPdying">PHP умирает?!</a>
+            </p>
+        </section>
+
+        <section>
+            <img src="https://www.php.net/images/logos/php-logo.svg" style="max-width: 70%" alt="">
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim data-line-numbers>
+                    function to_array(iterable $values): array
+                    {
+                        if (is_array($values)) {
+                            return $values;
+                        }
+
+                        return iterator_to_array($values);
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim data-line-numbers>
+                    /**
+                     * @template TKey of array-key
+                     * @template TValue
+                     * @template TValues of iterable&lt;TKey, TValue&gt;
+                     * @param TValues $values
+                     * @return (TValues is non-empty-array
+                     *     ? non-empty-array&lt;TKey, TValue&gt;
+                     *     : array&lt;TKey, TValue&gt;)
+                     */
+                    function to_array(iterable $values): array
+                    {
+                        if (is_array($values)) {
+                            return $values;
+                        }
+
+                        return iterator_to_array($values);
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim data-line-numbers>
+                    final readonly class DraftArticle
+                    {
+                        public function __construct(
+                            #[Assert\NotBlank]
+                            public string $title,
+                            #[Assert\Choice(['PHP', 'Types'], multiple: true)]
+                            public array $tags,
+                        ) {}
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim data-line-numbers>
+                    /**
+                     * @param non-empty-string $title
+                     * @param list&lt;'PHP'|'Types'&gt; $tags
+                     */
+                    final readonly class DraftArticle
+                    {
+                        public function __construct(
+                            #[Assert\NotBlank]
+                            public string $title,
+                            #[Assert\Choice(['PHP', 'Types'], multiple: true)]
+                            public array $tags,
+                        ) {}
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <h3>Type + PHP + 🌪 = Typhoon</h3>
+            <img src="typhoon.png" alt="Typhoon" style="max-width: 400px;">
+        </section>
+
+        <section>
+            <pre style="font-size: 1em; text-align: center;">
+                <code class="language-php" data-trim>
+                    interface Type {}
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: 1em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    never
+                    void
+                    null
+                    resource
+                    mixed
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .7em;">
+                <code class="language-php" data-trim>
+                    final readonly class NeverType implements Type {}
+
+                    final readonly class VoidType implements Type {}
+
+                    final readonly class NullType implements Type {}
+
+                    final readonly class ResourceType implements Type {}
+
+                    final readonly class MixedType implements Type {}
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .7em;">
+                <code class="language-php" data-trim>
+                    enum Types implements Type
+                    {
+                        case never;
+                        case void;
+                        case null;
+                        case resource;
+                        case mixed;
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: 1em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    bool / int / float / string
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: 1em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    bool = true | false
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .6em;">
+                <code class="language-php" data-trim>
+                    enum Types implements Type
+                    {
+                        // ...
+
+                        case bool;
+                    }
+
+                    final readonly class LiteralType implements Type
+                    {
+                        public function __construct(
+                            public bool $value,
+                        ) {}
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: 1em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    int
+                    37
+                    int&lt;-1, max&gt;
+                    int&lt;min, 269&gt;
+                    positive-int
+                    negative-int
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: 1em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    int = int&lt;min, max&gt;
+                    positive-int = int&lt;1, max&gt;
+                    negative-int = int&lt;min, -1&gt;
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .7em;">
+                <code class="language-php" data-trim>
+                    final readonly class IntType implements Type
+                    {
+                        public function __construct(
+                            public ?int $min,
+                            public ?int $max,
+                        ) {}
+                    }
+
+                    final readonly class LiteralType implements Type
+                    {
+                        public function __construct(
+                            public bool|int $value,
+                        ) {}
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: 1em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    float
+                    2,7182818284
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .6em;">
+                <code class="language-php" data-trim>
+                    enum Types implements Type
+                    {
+                        // ...
+
+                        case float;
+                    }
+
+                    final readonly class LiteralType implements Type
+                    {
+                        public function __construct(
+                            public bool|int|float $value,
+                        ) {}
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section style="display:flex; width: 100%; height: 100%;">
+            <img src="strings-rust-vs-php.jpg" alt="">
+        </section>
+
+        <section style="display:flex; width: 100%; height: 100%;">
+            <img src="strings-php-vs-java.jpg" alt="">
+        </section>
+
+        <section>
+            <pre style="font-size: 1em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    string
+                    'trololo'
+                    non-empty-string
+                    class-string&lt;TObject&gt;
+                    numeric-string
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .6em;">
+                <code class="language-php" data-trim>
+                    enum Types implements Type
+                    {
+                        // ...
+
+                        case string;
+                    }
+
+                    final readonly class LiteralType implements Type
+                    {
+                        public function __construct(
+                            public bool|int|float|string $value,
+                        ) {}
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .6em;">
+                <code class="language-php" data-trim>
+                    final readonly class ClassStringType implements Type
+                    {
+                        public function __construct(
+                            public Type $class,
+                        ) {}
+                    }
+
+                    final readonly class NonEmptyType implements Type
+                    {
+                        public function __construct(
+                            public Type $type,
+                        ) {}
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .9em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    numeric-string = numeric & string
+                </code>
+            </pre>
+            <pre style="font-size: .9em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    numeric = numeric-string | int | float
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .6em;">
+                <code class="language-php" data-trim>
+                    enum Types implements Type
+                    {
+                        // ...
+
+                        case numericString;
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: 1em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    array
+                    array&lt;TKey, TValue&gt;
+                    array{a: string, b?: 1}
+                    array{a: string, ...}
+                    array{a: string, ...&lt;int, object&gt;}
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    final readonly class ArrayElement
+                    {
+                        public function __construct(
+                            public readonly Type $type,
+                            public readonly bool $optional = false,
+                        ) {}
+                    }
+
+                    final readonly class ArrayType implements Type
+                    {
+                        /**
+                         * @param array&lt;ArrayElement&gt; $elements
+                         */
+                        public function __construct(
+                            public Type $key,
+                            public Type $value,
+                            public array $elements,
+                        ) {}
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .8em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    callable
+                    callable(string, int=, ...mixed): object
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    final readonly class Parameter
+                    {
+                        public function __construct(
+                            public Type $type,
+                            public bool $hasDefault,
+                            public bool $variadic,
+                            public bool $byReference,
+                        ) {}
+                    }
+
+                    final class CallableType implements Type
+                    {
+                        /**
+                         * @param list&lt;Parameter&gt; $parameters
+                         */
+                        public function __construct(
+                            public readonly array $parameters,
+                            public readonly Type $return,
+                        ) {}
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .8em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    object
+                    MyClass
+                    Iterator&lt;int, string&gt;
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    enum Types implements Type
+                    {
+                        // ...
+
+                        case object;
+                    }
+
+                    final readonly class NamedObject
+                    {
+                        /**
+                         * @param non-empty-string $class
+                         * @param list&lt;Type&gt; $arguments
+                         */
+                        public function __construct(
+                            public string $class,
+                            public array $arguments,
+                        ) {}
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    /**
+                     * @template-covariant TC of object
+                     */
+                    final readonly class MyClass
+                    {
+                        /**
+                         * @var TC
+                         */
+                        public object $prop;
+
+                        /**
+                         * @template TM
+                         * @return TM
+                         */
+                        public function method(): mixed {}
+                    }
+
+                    /**
+                     * @template TF
+                     * @return TF
+                     */
+                    function myFunction(): mixed {}
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    final readonly class AtMethod
+                    {
+                        /**
+                         * @param non-empty-string $class
+                         * @param non-empty-string $name
+                         */
+                        public function __construct(
+                            public string $class,
+                            public string $name,
+                        ) {}
+                    }
+
+                    final readonly class TemplateType implements Type
+                    {
+                        /**
+                         * @param non-empty-string $name
+                         */
+                        public function __construct(
+                            public string $name,
+                            public AtFunction|AtClass|AtMethod $declaredAt,
+                        ) {}
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .8em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    ?string
+                    int|float
+                    Traversable&Stringable
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    final readonly class UnionType implements Type
+                    {
+                        /**
+                         * @param non-empty-list&lt;Type&gt; $types
+                         */
+                        public function __construct(
+                            public array $types,
+                        ) {}
+                    }
+
+                    final readonly class IntersectionType implements Type
+                    {
+                        /**
+                         * @param non-empty-list&lt;Type&gt; $types
+                         */
+                        public function __construct(
+                            public array $types,
+                        ) {}
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .8em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    ($throw is true ? T : ?T)
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    final readonly class ConditionalType implements Type
+                    {
+                        public function __construct(
+                            public Argument|Type $subject,
+                            public Type $if,
+                            public Type $then,
+                            public Type $else,
+                        ) {}
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: 1em; text-align: center;">
+                <code class="language-php" data-trim>
+                    interface Type {}
+                </code>
+            </pre>
+            <br>
+            <ul>
+                <li>Приведение к строке</li>
+                <li>Сравнение</li>
+                <li>Вычисление union и intersection</li>
+            </ul>
+        </section>
+
+        <section>
+            <pre style="font-size: .6em;">
+                <code class="language-php" data-trim>
+                    interface Type
+                    {
+                        /**
+                         * @template TReturn
+                         * @param TypeVisitor&lt;TReturn&gt; $visitor
+                         * @return TReturn
+                         */
+                        public function accept(TypeVisitor $visitor): mixed;
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    /**
+                     * @template-covariant TReturn
+                     */
+                    interface TypeVisitor
+                    {
+                        /**
+                         * @return TReturn
+                         */
+                        public function int(IntType $type): mixed;
+                    }
+
+                    final readonly class IntType implements Type
+                    {
+                        public function __construct(
+                            public ?int $min,
+                            public ?int $max,
+                        ) {}
+
+                        public function accept(TypeVisitor $visitor): mixed
+                        {
+                            return $visitor->int($this);
+                        }
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    /** @template-covariant TReturn */
+                    interface TypeVisitor
+                    {
+                        /** @return TReturn */
+                        public function int(?int $min, ?int $max): mixed;
+                    }
+
+                    /**
+                     * @internal
+                     */
+                    final readonly class IntType implements Type
+                    {
+                        public function __construct(
+                            private ?int $min,
+                            private ?int $max,
+                        ) {}
+
+                        public function accept(TypeVisitor $visitor): mixed
+                        {
+                            return $visitor->int($this->min, $this->max);
+                        }
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    /** @template-covariant TReturn */
+                    interface TypeVisitor
+                    {
+                        /** @return TReturn */
+                        public function int(Type $self, ?int $min, ?int $max): mixed;
+                    }
+
+                    /** @internal */
+                    final readonly class IntType implements Type
+                    {
+                        public function __construct(
+                            private ?int $min,
+                            private ?int $max,
+                        ) {}
+
+                        public function accept(TypeVisitor $visitor): mixed
+                        {
+                            return $visitor->int($this, $this->min, $this->max);
+                        }
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    enum Types implements Type
+                    {
+                        // ...
+
+                        case int;
+                        case positiveInt;
+                        case negativeInt;
+
+                        public function accept(TypeVisitor $visitor): mixed
+                        {
+                            return match($this) {
+                                // ...
+                                self::int => $visitor->int($this, min: null, max: null),
+                                self::positiveInt => $visitor->int($this, min: 1, max: null),
+                                self::negativeInt => $visitor->int($this, min: null, max: -1),
+                            };
+                        }
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: 1em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    self / parent / static
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .8em;">
+                <code class="language-php" data-trim>
+                    final readonly class X extends Y
+                    {
+                        private self $x;
+
+                        private parent $y;
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .8em;">
+                <code class="language-php" data-trim>
+                    trait T
+                    {
+                        private self $x;
+
+                        private parent $y;
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <h3>Спасибо за внимание!</h3>
+            <img src="feedback-qr.gif" alt="QR code" style="width: 40%">
+            <p>
+                <a href="https://t.me/vudaltsov">@vudaltsov</a> /
+                <a href="https://t.me/phpyh">Пых</a> /
+                <a href="https://youtube.com/@PHPPoint">PHP Point</a> /
+                <a href="https://t.me/isPHPdying">PHP умирает?!</a>
+            </p>
+        </section>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/reveal.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.0.4/plugin/highlight/highlight.min.js"></script>
+<script>
+    Reveal.initialize({
+        controls: true,
+        progress: true,
+        history: true,
+        plugins: [RevealHighlight],
+        slideNumber: true,
+        autoAnimate: true,
+    });
+</script>
+</body>
+</html>
