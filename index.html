@@ -16,7 +16,7 @@
             --r-block-margin: 10px;
         }
         .reveal pre {
-            font-size: .5em;
+            font-size: .7em;
         }
         .nohighlight {
             padding: 1em !important;
@@ -60,12 +60,17 @@
 <body>
 <div class="reveal">
     <div class="slides">
-        <section >
-            <img src="header.png" alt="" style="width: 100%;">
+        <section>
+            <img src="header.png" alt="">
         </section>
 
         <section>
-            <p><img src="avatar.jpg" alt="" style="max-width: 300px;"></p>
+            <h3 style="margin-bottom: 40px;">
+                <img src="section.png" alt="" style="height: 50px; display: inline; padding-bottom: 10px; margin: 0; vertical-align: middle;">
+                Разработка /
+                PHP
+            </h3>
+            <p><img src="avatar.jpg" alt="" style="max-width: 300px; border-radius: 40px;"></p>
             <p>Валентин <a href="https://t.me/vudaltsov">@vudaltsov</a></p>
             <p>
                 <a href="https://t.me/phpyh">Пых</a> /
@@ -80,14 +85,17 @@
 
         <section>
             <pre>
-                <code class="language-php" data-trim data-line-numbers>
-                    function to_array(iterable $values): array
+                <code class="language-php" data-trim>
+                    function toList(iterable $values): array
                     {
                         if (is_array($values)) {
-                            return $values;
+                            return array_values($values);
                         }
 
-                        return iterator_to_array($values);
+                        return iterator_to_array(
+                            $values,
+                            preserve_keys: false,
+                        );
                     }
                 </code>
             </pre>
@@ -95,37 +103,36 @@
 
         <section>
             <pre>
-                <code class="language-php" data-trim data-line-numbers>
+                <code class="language-php" data-trim>
                     /**
-                     * @template TKey of array-key
                      * @template TValue
-                     * @template TValues of iterable&lt;TKey, TValue&gt;
+                     * @template TValues of iterable&lt;TValue&gt;
                      * @param TValues $values
                      * @return (TValues is non-empty-array
-                     *     ? non-empty-array&lt;TKey, TValue&gt;
-                     *     : array&lt;TKey, TValue&gt;)
+                     *     ? non-empty-list&lt;TValue&gt;
+                     *     : list&lt;TValue&gt;)
                      */
-                    function to_array(iterable $values): array
+                    function toList(iterable $values): array
                     {
                         if (is_array($values)) {
-                            return $values;
+                            return array_values($values);
                         }
 
-                        return iterator_to_array($values);
+                        return iterator_to_array($values, false);
                     }
                 </code>
             </pre>
         </section>
 
         <section>
-            <pre>
-                <code class="language-php" data-trim data-line-numbers>
+            <pre style="font-size: 0.65em">
+                <code class="language-php" data-trim>
                     final readonly class DraftArticle
                     {
                         public function __construct(
                             #[Assert\NotBlank]
                             public string $title,
-                            #[Assert\Choice(['PHP', 'Types'], multiple: true)]
+                            #[Assert\Choice(['PHP', 'type'], multiple: true)]
                             public array $tags,
                         ) {}
                     }
@@ -134,18 +141,18 @@
         </section>
 
         <section>
-            <pre>
-                <code class="language-php" data-trim data-line-numbers>
+            <pre style="font-size: 0.65em">
+                <code class="language-php" data-trim>
                     /**
                      * @param non-empty-string $title
-                     * @param list&lt;'PHP'|'Types'&gt; $tags
+                     * @param list&lt;'PHP'|'type'&gt; $tags
                      */
                     final readonly class DraftArticle
                     {
                         public function __construct(
                             #[Assert\NotBlank]
                             public string $title,
-                            #[Assert\Choice(['PHP', 'Types'], multiple: true)]
+                            #[Assert\Choice(['PHP', 'type'], multiple: true)]
                             public array $tags,
                         ) {}
                     }
@@ -154,12 +161,12 @@
         </section>
 
         <section>
-            <h3>Type + PHP + 🌪 = Typhoon</h3>
-            <img src="typhoon.png" alt="Typhoon" style="max-width: 400px;">
+            <img src="typhoon.png" alt="Typhoon" style="max-width: 45%;">
+            <h3>Type + PHP + 🌪 = <a href="https://github.com/typhoon-php/typhoon">Typhoon</a></h3>
         </section>
 
         <section>
-            <pre style="font-size: 1em; text-align: center;">
+            <pre style="font-size: 1.2em; text-align: center;">
                 <code class="language-php" data-trim>
                     interface Type {}
                 </code>
@@ -172,14 +179,18 @@
                     never
                     void
                     null
-                    resource
                     mixed
                 </code>
             </pre>
         </section>
 
         <section>
-            <pre style="font-size: .7em;">
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    never / void / null / mixed
+                </code>
+            </pre>
+            <pre>
                 <code class="language-php" data-trim>
                     final readonly class NeverType implements Type {}
 
@@ -187,32 +198,26 @@
 
                     final readonly class NullType implements Type {}
 
-                    final readonly class ResourceType implements Type {}
-
                     final readonly class MixedType implements Type {}
                 </code>
             </pre>
         </section>
 
         <section>
-            <pre style="font-size: .7em;">
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    never / void / null / mixed
+                </code>
+            </pre>
+            <pre>
                 <code class="language-php" data-trim>
-                    enum Types implements Type
+                    enum types implements Type
                     {
                         case never;
                         case void;
                         case null;
-                        case resource;
                         case mixed;
                     }
-                </code>
-            </pre>
-        </section>
-
-        <section>
-            <pre style="font-size: 1em; text-align: center;">
-                <code class="nohighlight" data-trim>
-                    bool / int / float / string
                 </code>
             </pre>
         </section>
@@ -226,21 +231,40 @@
         </section>
 
         <section>
-            <pre style="font-size: .6em;">
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    bool
+                </code>
+            </pre>
+            <pre>
                 <code class="language-php" data-trim>
-                    enum Types implements Type
+                    enum types implements Type
                     {
                         // ...
 
                         case bool;
                     }
+                </code>
+            </pre>
+        </section>
 
+        <section>
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    true / false
+                </code>
+            </pre>
+            <pre>
+                <code class="language-php" data-trim>
                     final readonly class LiteralType implements Type
                     {
                         public function __construct(
                             public bool $value,
                         ) {}
                     }
+
+                    new LiteralType(true);
+                    new LiteralType(false);
                 </code>
             </pre>
         </section>
@@ -248,8 +272,8 @@
         <section>
             <pre style="font-size: 1em; text-align: center;">
                 <code class="nohighlight" data-trim>
-                    int
                     37
+                    int
                     int&lt;-1, max&gt;
                     int&lt;min, 269&gt;
                     positive-int
@@ -261,7 +285,10 @@
         <section>
             <pre style="font-size: 1em; text-align: center;">
                 <code class="nohighlight" data-trim>
+                    37 = int&lt;37, 37&gt;
                     int = int&lt;min, max&gt;
+                    int&lt;-1, max&gt;
+                    int&lt;min, 269&gt;
                     positive-int = int&lt;1, max&gt;
                     negative-int = int&lt;min, -1&gt;
                 </code>
@@ -269,97 +296,112 @@
         </section>
 
         <section>
-            <pre style="font-size: .7em;">
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    37
+                </code>
+            </pre>
+            <pre>
                 <code class="language-php" data-trim>
-                    final readonly class IntType implements Type
-                    {
-                        public function __construct(
-                            public ?int $min,
-                            public ?int $max,
-                        ) {}
-                    }
-
                     final readonly class LiteralType implements Type
                     {
                         public function __construct(
                             public bool|int $value,
                         ) {}
                     }
+
+                    new LiteralType(37);
                 </code>
             </pre>
         </section>
 
         <section>
-            <pre style="font-size: 1em; text-align: center;">
+            <pre style="text-align: center;">
                 <code class="nohighlight" data-trim>
-                    float
-                    2,7182818284
+                    int / int&lt;1, 10&gt;
                 </code>
             </pre>
-        </section>
-
-        <section>
-            <pre style="font-size: .6em;">
+            <pre>
                 <code class="language-php" data-trim>
-                    enum Types implements Type
-                    {
-                        // ...
-
-                        case float;
-                    }
-
-                    final readonly class LiteralType implements Type
+                    final readonly class IntType implements Type
                     {
                         public function __construct(
-                            public bool|int|float $value,
+                            public ?int $min = null,
+                            public ?int $max = null,
                         ) {}
                     }
+
+                    new IntType();
+                    new IntType(min: 1, max: 10);
                 </code>
             </pre>
         </section>
 
-        <section style="display:flex; width: 100%; height: 100%;">
+        <section>
             <img src="strings-rust-vs-php.jpg" alt="">
         </section>
 
-        <section style="display:flex; width: 100%; height: 100%;">
+        <section>
             <img src="strings-php-vs-java.jpg" alt="">
         </section>
 
         <section>
             <pre style="font-size: 1em; text-align: center;">
                 <code class="nohighlight" data-trim>
-                    string
                     'trololo'
+                    string
                     non-empty-string
-                    class-string&lt;TObject&gt;
+                    class-string&lt;MyClass&gt;
                     numeric-string
                 </code>
             </pre>
         </section>
 
         <section>
-            <pre style="font-size: .6em;">
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    'trololo'
+                </code>
+            </pre>
+            <pre>
                 <code class="language-php" data-trim>
-                    enum Types implements Type
-                    {
-                        // ...
-
-                        case string;
-                    }
-
                     final readonly class LiteralType implements Type
                     {
                         public function __construct(
                             public bool|int|float|string $value,
                         ) {}
                     }
+
+                    new LiteralType('trololo');
                 </code>
             </pre>
         </section>
 
         <section>
-            <pre style="font-size: .6em;">
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    string
+                </code>
+            </pre>
+            <pre>
+                <code class="language-php" data-trim>
+                    enum types implements Type
+                    {
+                        // ...
+
+                        case string;
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    class-string&lt;MyClass&gt;
+                </code>
+            </pre>
+            <pre>
                 <code class="language-php" data-trim>
                     final readonly class ClassStringType implements Type
                     {
@@ -368,12 +410,27 @@
                         ) {}
                     }
 
+                    new ClassStringType(new NamedObjectType('MyClass'));
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    non-empty-string
+                </code>
+            </pre>
+            <pre>
+                <code class="language-php" data-trim>
                     final readonly class NonEmptyType implements Type
                     {
                         public function __construct(
                             public Type $type,
                         ) {}
                     }
+
+                    new NonEmptyType(types::string);
                 </code>
             </pre>
         </section>
@@ -386,20 +443,31 @@
             </pre>
             <pre style="font-size: .9em; text-align: center;">
                 <code class="nohighlight" data-trim>
-                    numeric = numeric-string | int | float
+                    numeric = int | float | numeric-string
                 </code>
             </pre>
         </section>
 
         <section>
-            <pre style="font-size: .6em;">
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    numeric-string / numeric
+                </code>
+            </pre>
+            <pre>
                 <code class="language-php" data-trim>
-                    enum Types implements Type
+                    enum types implements Type
                     {
                         // ...
 
                         case numericString;
                     }
+
+                    $numeric = new UnionType([
+                        types::int,
+                        types::float,
+                        types::numericString,
+                    ]);
                 </code>
             </pre>
         </section>
@@ -408,7 +476,7 @@
             <pre style="font-size: 1em; text-align: center;">
                 <code class="nohighlight" data-trim>
                     array
-                    array&lt;TKey, TValue&gt;
+                    array&lt;int, string&gt;
                     array{a: string, b?: 1}
                     array{a: string, ...}
                     array{a: string, ...&lt;int, object&gt;}
@@ -417,7 +485,7 @@
         </section>
 
         <section>
-            <pre>
+            <pre style="font-size: 0.6em;">
                 <code class="language-php" data-trim>
                     final readonly class ArrayElement
                     {
@@ -429,13 +497,14 @@
 
                     final readonly class ArrayType implements Type
                     {
-                        /**
-                         * @param array&lt;ArrayElement&gt; $elements
-                         */
+                        /** @param array&lt;ArrayElement&gt; $elements */
                         public function __construct(
-                            public Type $key,
-                            public Type $value,
-                            public array $elements,
+                            public Type $key = new UnionType([
+                                types::int,
+                                types::string,
+                            ]),
+                            public Type $value = types::mixed,
+                            public array $elements = [],
                         ) {}
                     }
                 </code>
@@ -443,24 +512,88 @@
         </section>
 
         <section>
-            <pre style="font-size: .8em; text-align: center;">
+            <pre style="text-align: center;">
                 <code class="nohighlight" data-trim>
-                    callable
-                    callable(string, int=, ...mixed): object
+                    array
+                </code>
+            </pre>
+            <pre>
+                <code class="language-php" data-trim>
+                    new ArrayType();
                 </code>
             </pre>
         </section>
 
         <section>
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    array&lt;int, string&gt;
+                </code>
+            </pre>
             <pre>
+                <code class="language-php" data-trim>
+                    new ArrayType(types::int, types::string);
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    array{a: string, b?: 1, ...}
+                </code>
+            </pre>
+            <pre>
+                <code class="language-php" data-trim>
+                    new ArrayType(elements: [
+                        'a' => new ArrayElement(types::string),
+                        'b' => new ArrayElement(
+                            type: new LiteralType(1),
+                            optional: true,
+                        ),
+                    ]);
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    array{a: string}
+                </code>
+            </pre>
+            <pre>
+                <code class="language-php" data-trim>
+                    new ArrayType(
+                        key: types::never,
+                        value: types::never,
+                        elements: [
+                            'a' => new ArrayElement(types::string),
+                        ],
+                    );
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: .9em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    callable
+                    callable(string, int=, ...mixed): float
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: 0.6em;">
                 <code class="language-php" data-trim>
                     final readonly class Parameter
                     {
                         public function __construct(
                             public Type $type,
-                            public bool $hasDefault,
-                            public bool $variadic,
-                            public bool $byReference,
+                            public bool $hasDefault = false,
+                            public bool $variadic = false,
+                            public bool $byReference = false,
                         ) {}
                     }
 
@@ -470,8 +603,8 @@
                          * @param list&lt;Parameter&gt; $parameters
                          */
                         public function __construct(
-                            public readonly array $parameters,
-                            public readonly Type $return,
+                            public readonly array $parameters = [],
+                            public readonly Type $return = types::mixed,
                         ) {}
                     }
                 </code>
@@ -479,26 +612,62 @@
         </section>
 
         <section>
-            <pre style="font-size: .8em; text-align: center;">
+            <pre style="text-align: center;">
                 <code class="nohighlight" data-trim>
-                    object
-                    MyClass
-                    Iterator&lt;int, string&gt;
+                    callable(string, int=, ...mixed): float
+                </code>
+            </pre>
+            <pre>
+                <code class="language-php" data-trim>
+                    new CallableType(
+                        parameters: [
+                            new Parameter(types::string),
+                            new Parameter(types::int, hasDefault: true),
+                            new Parameter(types::mixed, variadic: true),
+                        ],
+                        return: types::float,
+                    );
                 </code>
             </pre>
         </section>
 
         <section>
+            <pre style="font-size: 1em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    object
+                    MyClass
+                    MyClass&lt;string&gt;
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    object
+                </code>
+            </pre>
             <pre>
                 <code class="language-php" data-trim>
-                    enum Types implements Type
+                    enum types implements Type
                     {
                         // ...
 
                         case object;
                     }
+                </code>
+            </pre>
+        </section>
 
-                    final readonly class NamedObject
+        <section>
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    MyClass / MyClass&lt;string&gt;
+                </code>
+            </pre>
+            <pre>
+                <code class="language-php" data-trim>
+                    final readonly class NamedObjectType
                     {
                         /**
                          * @param non-empty-string $class
@@ -506,36 +675,37 @@
                          */
                         public function __construct(
                             public string $class,
-                            public array $arguments,
+                            public array $arguments = [],
                         ) {}
                     }
+
+                    new NamedObjectType(MyClass::class);
+                    new NamedObjectType(MyClass::class, [types::string]);
                 </code>
             </pre>
         </section>
 
         <section>
-            <pre>
+            <pre style="font-size: 0.6em;">
                 <code class="language-php" data-trim>
                     /**
-                     * @template-covariant TC of object
+                     * @template-covariant TAtClass of object */
                      */
                     final readonly class MyClass
                     {
-                        /**
-                         * @var TC
-                         */
+                        /** @var TAtClass */
                         public object $prop;
 
                         /**
-                         * @template TM
-                         * @return TM
+                         * @template TAtMethod of int|string
+                         * @return TAtMethod
                          */
-                        public function method(): mixed {}
+                        public function method(): int|string {}
                     }
 
                     /**
-                     * @template TF
-                     * @return TF
+                     * @template TAtFunction
+                     * @return TAtFunction
                      */
                     function myFunction(): mixed {}
                 </code>
@@ -543,16 +713,14 @@
         </section>
 
         <section>
-            <pre>
+            <pre style="font-size: 0.6em;">
                 <code class="language-php" data-trim>
-                    final readonly class AtMethod
+                    final readonly class AtClass
                     {
                         /**
-                         * @param non-empty-string $class
                          * @param non-empty-string $name
                          */
                         public function __construct(
-                            public string $class,
                             public string $name,
                         ) {}
                     }
@@ -572,37 +740,50 @@
         </section>
 
         <section>
-            <pre style="font-size: .8em; text-align: center;">
+            <pre style="text-align: center;">
                 <code class="nohighlight" data-trim>
-                    ?string
-                    int|float
-                    Traversable&Stringable
+                    T@MyClass
+                </code>
+            </pre>
+            <pre>
+                <code class="language-php" data-trim>
+                    new TemplateType(
+                        name: 'T',
+                        declaredAt: new AtClass(MyClass::class),
+                    );
                 </code>
             </pre>
         </section>
 
         <section>
+            <pre style="font-size: 1em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    ?string
+                    int|float
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    ?string / int|float
+                </code>
+            </pre>
             <pre>
                 <code class="language-php" data-trim>
                     final readonly class UnionType implements Type
                     {
                         /**
-                         * @param non-empty-list&lt;Type&gt; $types
+                         * @param non-empty-list&lt;Type&gt; $type
                          */
                         public function __construct(
-                            public array $types,
+                            public array $type,
                         ) {}
                     }
 
-                    final readonly class IntersectionType implements Type
-                    {
-                        /**
-                         * @param non-empty-list&lt;Type&gt; $types
-                         */
-                        public function __construct(
-                            public array $types,
-                        ) {}
-                    }
+                    new UnionType([types::null, types::string]);
+                    new UnionType([types::int, types::float]);
                 </code>
             </pre>
         </section>
@@ -610,7 +791,7 @@
         <section>
             <pre style="font-size: .8em; text-align: center;">
                 <code class="nohighlight" data-trim>
-                    ($throw is true ? T : ?T)
+                    ($throw is true ? int : float)
                 </code>
             </pre>
         </section>
@@ -618,6 +799,14 @@
         <section>
             <pre>
                 <code class="language-php" data-trim>
+                    final readonly class Argument
+                    {
+                        /** @param non-empty-string $name */
+                        public function __construct(
+                            public string $name,
+                        ) {}
+                    }
+
                     final readonly class ConditionalType implements Type
                     {
                         public function __construct(
@@ -632,17 +821,83 @@
         </section>
 
         <section>
-            <pre style="font-size: 1em; text-align: center;">
-                <code class="language-php" data-trim>
-                    interface Type {}
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    ($throw is true ? int : float)
                 </code>
             </pre>
-            <br>
-            <ul>
-                <li>Приведение к строке</li>
-                <li>Сравнение</li>
-                <li>Вычисление union и intersection</li>
-            </ul>
+            <pre>
+                <code class="language-php" data-trim>
+                    new ConditionalType(
+                        subject: new Argument('throw'),
+                        if: new LiteralType(true),
+                        then: types::int,
+                        else: types::false,
+                    );
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <h3 style="margin-bottom: 50px;">Приведение к строке</h3>
+            <pre>
+                <code class="language-php" data-trim>
+                    function stringify(Type $type): string {}
+
+                    throw new InvalidType(stringify(types::string));
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <h3 style="margin-bottom: 50px;">Сравнение</h3>
+            <pre>
+                <code class="language-php" data-trim>
+                    function isSubType(Type $type, Type $of): bool {}
+
+                    function isSuperType(Type $type, Type $of): bool {}
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    function equal(Type $a, Type $b): bool
+                    {
+                        return isSubType($a, $b) && isSubType($b, $a);
+                    }
+
+                    function irrelevant(Type $a, Type $b): bool
+                    {
+                        return !isSubType($a, $b) && !isSubType($b, $a);
+                    }
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <h3 style="margin-bottom: 50px;">Упрощение</h3>
+            <pre style="font-size: 1em;">
+                <code class="language-php" data-trim>
+                    negative-int|0|positive-int = int
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    interface Type
+                    {
+                        public function toString(): string;
+
+                        public function isSubTypeOf(self $type): bool;
+
+                        public function normalize(): self;
+                    }
+                </code>
+            </pre>
         </section>
 
         <section>
@@ -657,6 +912,17 @@
                          */
                         public function accept(TypeVisitor $visitor): mixed;
                     }
+
+                    /**
+                     * @template-covariant TReturn
+                     */
+                    interface TypeVisitor
+                    {
+                        /** @return TReturn */
+                        public function int(IntType $type): mixed;
+
+                        // Аналогичные методы для всех типов
+                    }
                 </code>
             </pre>
         </section>
@@ -664,17 +930,6 @@
         <section>
             <pre>
                 <code class="language-php" data-trim>
-                    /**
-                     * @template-covariant TReturn
-                     */
-                    interface TypeVisitor
-                    {
-                        /**
-                         * @return TReturn
-                         */
-                        public function int(IntType $type): mixed;
-                    }
-
                     final readonly class IntType implements Type
                     {
                         public function __construct(
@@ -692,45 +947,28 @@
         </section>
 
         <section>
-            <pre>
+            <pre style="font-size: 0.6em;">
                 <code class="language-php" data-trim>
-                    /** @template-covariant TReturn */
+                    /**
+                     * @template-covariant TReturn
+                     */
                     interface TypeVisitor
                     {
-                        /** @return TReturn */
-                        public function int(?int $min, ?int $max): mixed;
-                    }
-
-                    /**
-                     * @internal
-                     */
-                    final readonly class IntType implements Type
-                    {
-                        public function __construct(
-                            private ?int $min,
-                            private ?int $max,
-                        ) {}
-
-                        public function accept(TypeVisitor $visitor): mixed
-                        {
-                            return $visitor->int($this->min, $this->max);
-                        }
+                        /**
+                         * @return TReturn
+                         */
+                        function int(Type $self, ?int $min, ?int $max): mixed;
                     }
                 </code>
             </pre>
         </section>
 
         <section>
-            <pre>
+            <pre style="font-size: 0.6em;">
                 <code class="language-php" data-trim>
-                    /** @template-covariant TReturn */
-                    interface TypeVisitor
-                    {
-                        /** @return TReturn */
-                        public function int(Type $self, ?int $min, ?int $max): mixed;
-                    }
-
-                    /** @internal */
+                    /**
+                     * @internal
+                     */
                     final readonly class IntType implements Type
                     {
                         public function __construct(
@@ -748,9 +986,35 @@
         </section>
 
         <section>
+            <pre style="text-align: center;">
+                <code class="nohighlight" data-trim>
+                    int&lt;-10, 23&gt;
+                </code>
+            </pre>
             <pre>
                 <code class="language-php" data-trim>
-                    enum Types implements Type
+                    enum types implements Type
+                    {
+                        // ...
+
+                        public static function int(
+                            ?int $min = null,
+                            ?int $max = null,
+                        ): Type
+                        {
+                            return new IntType($min, $max);
+                        }
+                    }
+
+                    types::int(-10, 23);
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: 0.6em;">
+                <code class="language-php" data-trim>
+                    enum types implements Type
                     {
                         // ...
 
@@ -762,9 +1026,9 @@
                         {
                             return match($this) {
                                 // ...
-                                self::int => $visitor->int($this, min: null, max: null),
-                                self::positiveInt => $visitor->int($this, min: 1, max: null),
-                                self::negativeInt => $visitor->int($this, min: null, max: -1),
+                                self::int => $visitor->int($this),
+                                self::positiveInt => $visitor->int($this, min: 1),
+                                self::negativeInt => $visitor->int($this, max: -1),
                             };
                         }
                     }
@@ -773,44 +1037,220 @@
         </section>
 
         <section>
-            <pre style="font-size: 1em; text-align: center;">
-                <code class="nohighlight" data-trim>
-                    self / parent / static
+            <pre style="font-size: 0.59em;">
+                <code class="language-php" data-trim>
+                    /**
+                     * @implements TypeVisitor&lt;non-empty-string&gt;
+                     */
+                    final readonly class TypeStringifier implements TypeVisitor
+                    {
+                        public function int(Type $self, ?int $min, ?int $max): mixed
+                        {
+                            return sprintf(
+                                'int<%s, %s>',
+                                $min ?? 'min',
+                                $max ?? 'max',
+                            );
+                        }
+                    }
+
+                    // int<1, 10>
+                    echo types::int(1, 10)->accept(new TypeStringifier());
                 </code>
             </pre>
         </section>
 
         <section>
-            <pre style="font-size: .8em;">
+            <pre style="font-size: 1em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    self
+                    parent
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
                 <code class="language-php" data-trim>
                     final readonly class X extends Y
                     {
-                        private self $x;
+                        private self $prop1;
 
-                        private parent $y;
+                        private parent $prop2;
+                    }
+
+                    $self = types::object(X::class);
+                    $parent = types::object(Y::class);
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    trait T
+                    {
+                        private self $prop1;
+
+                        private parent $prop2;
+                    }
+
+                    final readonly class X extends Y
+                    {
+                        use T;
                     }
                 </code>
             </pre>
         </section>
 
         <section>
-            <pre style="font-size: .8em;">
+            <pre>
                 <code class="language-php" data-trim>
+                    /**
+                     * @require-extends Y
+                     * @require-implements I
+                     */
                     trait T
                     {
-                        private self $x;
-
-                        private parent $y;
+                        private self $prop1;
+                        private parent $prop2;
                     }
                 </code>
             </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    /**
+                     * @require-extends Y
+                     * @require-implements I
+                     * @template self of Y&I
+                     * @template parent of Y
+                     */
+                    trait T
+                    {
+                        private self $prop1;
+                        private parent $prop2;
+                    }
+
+                    $traitSelf = types::template('self', T::class);
+                    $traitParent = types::template('parent', T::class);
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    /**
+                     * @require-extends Y
+                     * @require-implements I
+                     */
+                    trait T
+                    {
+                        private self $prop1;
+                        private parent $prop2;
+                    }
+
+                    $traitSelf = types::alias('self', 'trait');
+                    $traitParent = types::alias('parent', 'trait');
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre style="font-size: 1em; text-align: center;">
+                <code class="nohighlight" data-trim>
+                    static
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    abstract class A
+                    {
+                        final public static function create(): static
+                        {
+                            return new static();
+                        }
+                    }
+
+                    class B extends A {}
+
+                    class C extends B {}
+
+                    var_dump(B::create()::class); // B
+                    var_dump(C::create()::class); // C
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    /**
+                     * @template-covariant static of self
+                     */
+                    abstract class A {}
+
+                    /**
+                     * @template-covariant static of self
+                     * @extends A&lt;static&gt;
+                     */
+                    class B extends A {}
+
+                    /**
+                     * @template-covariant static of self
+                     * @extends B&lt;static&gt;
+                     */
+                    class C extends B {}
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    /**
+                     * @template-covariant static of self
+                     */
+                    abstract class A {}
+
+                    $static = types::template('static', A::class);
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <pre>
+                <code class="language-php" data-trim>
+                    /**
+                     * @template-covariant static of self
+                     */
+                    abstract class A {}
+
+                    $static = types::static(A::class);
+                </code>
+            </pre>
+        </section>
+
+        <section>
+            <img src="typhoon.png" alt="Typhoon" style="max-width: 45%">
+            <p>
+                <code style="font-size: 0.8em;">composer req typhoon/type</code><br>
+                <code style="font-size: 0.8em;">composer req typhoon/type-stringifier</code><br>
+                <code style="font-size: 0.8em;">composer req typhoon/reflection</code>
+            </p>
         </section>
 
         <section>
             <h3>Спасибо за внимание!</h3>
-            <img src="feedback-qr.gif" alt="QR code" style="width: 40%">
+            <img src="feedback-qr.gif" alt="QR code" style="width: 35%">
+            <p>Валентин <a href="https://t.me/vudaltsov">@vudaltsov</a></p>
             <p>
-                <a href="https://t.me/vudaltsov">@vudaltsov</a> /
                 <a href="https://t.me/phpyh">Пых</a> /
                 <a href="https://youtube.com/@PHPPoint">PHP Point</a> /
                 <a href="https://t.me/isPHPdying">PHP умирает?!</a>
